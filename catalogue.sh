@@ -29,66 +29,66 @@ else
    echo "you are root user"
 fi  # fi means end of if means end of statement
 
-dnf module disable nodejs -y
+dnf module disable nodejs -y &>> $LOGFILE
 
-VALIDATE $? "Disabling current nodejs" &>> $LOGFILE
+VALIDATE $? "Disabling current nodejs"
 
-dnf module enable nodejs:18 -y
+dnf module enable nodejs:18 -y &>> $LOGFILE
 
-VALIDATE $? "enabling nodejs::18" &>> $LOGFILE
+VALIDATE $? "enabling nodejs::18"
 
-dnf install nodejs -y
+dnf install nodejs -y &>> $LOGFILE
 
-VALIDATE $? "installing nodejs::18" &>> $LOGFILE
+VALIDATE $? "installing nodejs::18"
 
-useradd roboshop
+useradd roboshop &>> $LOGFILE
 
-VALIDATE $? "creating roboshop user" &>> $LOGFILE
+VALIDATE $? "creating roboshop user"
 
-mkdir /app
+mkdir /app &>> $LOGFILE
 
-VALIDATE $? "creating app directory" &>> $LOGFILE
+VALIDATE $? "creating app directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip
 
-VALIDATE $? "downloading catalogue app" &>> $LOGFILE
+VALIDATE $? "downloading catalogue app"
 
 cd /app 
 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>> $LOGFILE
 
-VALIDATE $? "unzipping catalogue app" &>> $LOGFILE
+VALIDATE $? "unzipping catalogue app"
 
-npm install 
+npm install &>> $LOGFILE
 
-VALIDATE $? "installing dependencies" &>> $LOGFILE
+VALIDATE $? "installing dependencies"
 
 #use absolute because catalogue.service exit there
 cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service
 
 VALIDATE $? "copying catalogue service file"
 
-systemctl daemon-reload
+systemctl daemon-reload &>> $LOGFILE
 
-VALIDATE $? "daemon reload" &>> $LOGFILE
+VALIDATE $? "daemon reload"
 
-systemctl enable catalogue
+systemctl enable catalogue &>> $LOGFILE
 
-VALIDATE $? "enable catalogue" &>> $LOGFILE
+VALIDATE $? "enable catalogue"
 
-systemctl start catalogue
+systemctl start catalogue &>> $LOGFILE
 
-VALIDATE $? "starting catalogue" &>> $LOGFILE
+VALIDATE $? "starting catalogue"
 
 cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
 
-VALIDATE $? "copying mongod repo" &>> $LOGFILE
+VALIDATE $? "copying mongod repo"
 
-dnf install mongodb-org-shell -y
+dnf install mongodb-org-shell -y &>> $LOGFILE
 
-VALIDATE $? "installing mongodb client" &>> $LOGFILE
+VALIDATE $? "installing mongodb client"
 
-mongo --host $MONGODB_HOST </app/schema/catalogue.js
+mongo --host $MONGODB_HOST </app/schema/catalogue.js &>> $LOGFILE
 
 VALIDATE $? "loading catalogue data in to mongodb"
 
