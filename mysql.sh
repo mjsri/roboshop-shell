@@ -5,6 +5,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+MONGDB_HOST=mongodb.daws76s.online
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
@@ -29,26 +30,26 @@ else
     echo "You are root user"
 fi # fi means reverse of if, indicating condition end
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
+dnf module disable mysql -y &>> $LOGFILE
 
-VALIDATE $? "Copied MongoDB Repo"
+VALIDATE $? "Disable current MySQL version"
 
-dnf install mongodb-org -y &>> $LOGFILE
+cp mysql.repo /etc/yum.repos.d/mysql.repo &>> $LOGFILE
 
-VALIDATE $? "Installing MongoDB"
+VALIDATE $? "Copied MySQl repo"
 
-systemctl enable mongod &>> $LOGFILE
+dnf install mysql-community-server -y &>> $LOGFILE
 
-VALIDATE $? "Enabling MongoDB"
+VALIDATE $? "Installing MySQL Server"
 
-systemctl start mongod &>> $LOGFILE
+systemctl enable mysqld &>> $LOGFILE 
 
-VALIDATE $? "Starting MongoDB"
+VALIDATE $? "Enabling MySQL Server"
 
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>> $LOGFILE
+systemctl start mysqld &>> $LOGFILE
 
-VALIDATE $? "Remote access to MongoDB"
+VALIDATE $? "Starting  MySQL Server" 
 
-systemctl restart mongod &>> $LOGFILE
+mysql_secure_installation --set-root-pass RoboShop@1 &>> $LOGFILE
 
-VALIDATE $? "Restarting MongoDB"
+VALIDATE $? "Setting  MySQL root password"

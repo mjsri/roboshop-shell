@@ -5,7 +5,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
-MONGDB_HOST=mongodb.daws76s.online
+
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
@@ -55,45 +55,33 @@ mkdir -p /app
 
 VALIDATE $? "creating app directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip  &>> $LOGFILE
+curl -o /tmp/cart.zip https://roboshop-builds.s3.amazonaws.com/cart.zip  &>> $LOGFILE
 
-VALIDATE $? "Downloading catalogue application"
+VALIDATE $? "Downloading cart application"
 
 cd /app 
 
-unzip -o /tmp/catalogue.zip  &>> $LOGFILE
+unzip -o /tmp/cart.zip  &>> $LOGFILE
 
-VALIDATE $? "unzipping catalogue"
+VALIDATE $? "unzipping cart"
 
 npm install  &>> $LOGFILE
 
 VALIDATE $? "Installing dependencies"
 
-# use absolute, because catalogue.service exists there
-cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
+# use absolute, because cart.service exists there
+cp /home/centos/roboshop-shell/cart.service /etc/systemd/system/cart.service &>> $LOGFILE
 
-VALIDATE $? "Copying catalogue service file"
+VALIDATE $? "Copying cart service file"
 
 systemctl daemon-reload &>> $LOGFILE
 
-VALIDATE $? "catalogue daemon reload"
+VALIDATE $? "cart daemon reload"
 
-systemctl enable catalogue &>> $LOGFILE
+systemctl enable cart &>> $LOGFILE
 
-VALIDATE $? "Enable catalogue"
+VALIDATE $? "Enable cart"
 
-systemctl start catalogue &>> $LOGFILE
+systemctl start cart &>> $LOGFILE
 
-VALIDATE $? "Starting catalogue"
-
-cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
-
-VALIDATE $? "copying mongodb repo"
-
-dnf install mongodb-org-shell -y &>> $LOGFILE
-
-VALIDATE $? "Installing MongoDB client"
-
-mongo --host $MONGDB_HOST </app/schema/catalogue.js &>> $LOGFILE
-
-VALIDATE $? "Loading catalouge data into MongoDB"
+VALIDATE $? "Starting cart"

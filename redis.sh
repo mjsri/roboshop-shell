@@ -8,6 +8,7 @@ N="\e[0m"
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
+exec &>$LOGFILE
 
 echo "script stareted executing at $TIMESTAMP" &>> $LOGFILE
 
@@ -29,26 +30,27 @@ else
     echo "You are root user"
 fi # fi means reverse of if, indicating condition end
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
 
-VALIDATE $? "Copied MongoDB Repo"
+dnf install https://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
 
-dnf install mongodb-org -y &>> $LOGFILE
+VALIDATE $? "Installing Remi release"
 
-VALIDATE $? "Installing MongoDB"
+dnf module enable redis:remi-6.2 -y
 
-systemctl enable mongod &>> $LOGFILE
+VALIDATE $? "enabling redis"
 
-VALIDATE $? "Enabling MongoDB"
+dnf install redis -y
 
-systemctl start mongod &>> $LOGFILE
+VALIDATE $? "Installing Redis"
 
-VALIDATE $? "Starting MongoDB"
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/redis/redis.conf
 
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>> $LOGFILE
+VALIDATE $? "allowing remote connections"
 
-VALIDATE $? "Remote access to MongoDB"
+systemctl enable redis
 
-systemctl restart mongod &>> $LOGFILE
+VALIDATE $? "Enabled Redis"
 
-VALIDATE $? "Restarting MongoDB"
+systemctl start redis
+
+VALIDATE $? "Started Redis"
