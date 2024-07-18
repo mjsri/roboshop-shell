@@ -3,7 +3,7 @@
 AMI=ami-0b4f379183e5706b9
 SG_ID=sg-0ff003356a354c08c
 INSTANCES=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "web")
-ZONE_ID=
+ZONE_ID=Z07244143QJ1OEE84DH86
 DOMAIN_NAME=srikanthdevops.online
 
 for i in "${INSTANCES[@]}"
